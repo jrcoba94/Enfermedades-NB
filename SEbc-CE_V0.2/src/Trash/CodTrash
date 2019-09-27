@@ -1,0 +1,687 @@
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+public ArrayList<String> sintomas = new ArrayList<String>();
+    String name;
+    String url;
+    public void ClasificarEnfermedades(){
+        String nombreFichE = txtPathArchivoEnf.getText();
+        String fileC = txtPathNuevoArchivo.getText();
+
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        try {
+            for (int i = 0; i < listOfFiles.length; i++) {
+                readFile(listOfFiles[i]);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+    
+    public void readFile(File path){
+        String nombreFichS = txtPathArchivoSint.getText();
+
+        FileReader frS = null;
+        File ficheroS = new File(nombreFichS);
+
+        int d1 = size(nombreFichS);
+
+        try {
+            name = path.getName();
+            url = path.getPath();
+            EnfermedadBO dis = new EnfermedadBO();
+
+            frS = new FileReader(ficheroS);
+            BufferedReader br = new BufferedReader(frS);
+            String linea;
+            String texto = "";
+            String matriz[][] = new String[d1][2];
+            int i = 0;
+            String[] a = new String[d1];
+
+            File archivo = new File(url);
+            FileReader lectorArchivo = new FileReader(archivo);
+            BufferedReader lectorFlujo = new BufferedReader(lectorArchivo);
+            String lineaTexto = "";
+            while ((lineaTexto = lectorFlujo.readLine()) != null) {
+                lineaTexto = lectorFlujo.readLine();
+            }
+            lectorFlujo.close();
+
+            if (matriz.length != 0) {
+                for (int h = 0; h < matriz.length; h++) {
+                    for (int o = 1; o < matriz[0].length; o++) {
+                        String text = matriz[h][o];
+                        if (text != null) {
+                            Pattern p = Pattern.compile("(?i)" + text);
+                            Matcher m = p.matcher(lineaTexto);
+                            while (m.find()) {
+                                if (m.find() == true) {
+                                    System.out.println(text);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                while (((linea = br.readLine()) != null) & (i < d1)) {
+                    a = linea.split(":");
+                    for (int j = 0; j < a.length; j++) {
+                        matriz[i][j] = a[j];
+                    }
+                    i++;
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+public void ClasificarEnfermedades() {
+        String nombreFichE = txtPathArchivoEnf.getText();
+        String fileC = txtPathNuevoArchivo.getText();
+
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        try {
+            for (int i = 0; i < listOfFiles.length; i++) {
+                buscar(listOfFiles[i]);//)) {
+//                    System.out.println("RESULTADOS:\nSe marcan las coincidencias entre << >>");
+//                    System.out.format("Coincidencias encontradas: %d\n", nencontradas);
+//                    System.out.format("Cadenas a mostrar: %d\n\n", encontradas.size());
+//                    for (String encontrada : encontradas) {
+//                        System.out.println(encontrada);
+//                    }
+//                } else {
+//                    System.out.println("NO SE ENCONTRARON COINCIDENCIAS EN LA BUSQUEDA");
+//                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static ArrayList<String> cadenas = new ArrayList<String>();
+    public static ArrayList<String> palabras = new ArrayList<String>();
+    public static ArrayList<String> encontradas = new ArrayList<String>();
+    public static int nencontradas = 0;
+
+    public boolean buscar(File Path) {
+        int d1 = size(txtPathArchivoSint.getText());
+        String linea;
+        String matriz[][] = new String[d1][2];
+        int i = 0;
+        String[] a = new String[d1];
+        try {
+            BufferedReader brE = new BufferedReader(new FileReader(Path));
+            String lin;
+            while ((lin = brE.readLine()) != null) {
+                cadenas.add(lin);
+            }
+            File pathS = new File(txtPathArchivoSint.getText());
+            BufferedReader brS = new BufferedReader(new FileReader(pathS));
+            String linS;
+
+            while (((linea = brS.readLine()) != null) & (i < d1)) {
+                a = linea.split(":");
+                for (int j = 0; j < a.length; j++) {
+                    matriz[i][j] = a[j];
+                }
+                i++;
+            }
+
+            for (int h = 0; h < matriz.length; h++) {
+                for (int o = 1; o < matriz[0].length; o++) {
+                    palabras.add(matriz[h][o]);
+                }
+            }
+
+            String patron = String.join("|", palabras);
+            for (String cadena : cadenas) {
+                Pattern pattern = Pattern.compile("\\b(" + patron + ")\\b", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(cadena);
+                String cadena_modif = "";
+                while (matcher.find()) {
+                    nencontradas++;
+                    cadena_modif = cadena.replaceAll(matcher.group(1), "$1");
+                }
+                if (cadena_modif != "") {
+                    encontradas.add(cadena_modif);
+                }
+            }
+            for (String encontrada : encontradas) {
+                System.out.println(encontrada);
+            }
+            if (encontradas.size() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+public void ClasificarEnfermedades() {
+        String nombreFichE = txtPathArchivoEnf.getText();
+        String fileC = txtPathNuevoArchivo.getText();
+
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        try {
+            for (int i = 0; i < listOfFiles.length; i++) {
+                DiseaseBO disease = readFile(listOfFiles[i]);
+                if (disease != null) {
+                    PrintWriter output = new PrintWriter(disease.getName(), "ISO-8859-1");
+                    try {
+                        System.out.println("-------------");
+                        System.out.println("URL: " + disease.getUrl());
+                        LinkedList<String> lines = disease.getSintomaLines();
+                        System.out.println("Concepts retrieved for disease: " + disease.getName() + "\n");
+                        System.out.println("-------------");
+                        for (int k = 0; k < lines.size(); k++) {
+                            if (lines.get(k) != null) {
+                                ArrayList<Ev> concepts = performNLP(lines.get(k));
+                                output.write("\nLine: " + lines.get(k));
+                                for (int j = 0; j < concepts.size(); j++) {
+                                    Ev concept = concepts.get(j);
+                                    output.write("\t\t" + concept.getConceptName()
+                                            + " (CUI: " + concept.getConceptId()
+                                            + ") - " + concept.getSemanticTypes());
+                                }
+                            }
+                        }
+                        output.write("\nURL: " + disease.getUrl());
+                        output.close();
+                    } catch (Exception e) {
+                        System.err.println("Error performing NLP: "
+                                + e.getMessage());
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public DiseaseBO readFile(File PathE) {
+        String nombreFichS = txtPathArchivoSint.getText();
+
+        FileReader frS = null;
+        File ficheroS = new File(nombreFichS);
+
+        int d1 = size(nombreFichS);
+
+        try {
+            String name = PathE.getName();
+            String url = PathE.getPath();
+            DiseaseBO dis = new DiseaseBO(name, url);
+
+            frS = new FileReader(ficheroS);
+            BufferedReader br = new BufferedReader(frS);
+            String linea;
+            String texto = "";
+            String matriz[][] = new String[d1][2];
+            int i = 0;
+            String[] a = new String[d1];
+
+            File archivo = new File(url);
+            FileReader lectorArchivo = new FileReader(archivo);
+            BufferedReader lectorFlujo = new BufferedReader(lectorArchivo);
+            String lineaTexto = "";
+            while ((lineaTexto = lectorFlujo.readLine()) != null) {
+                lineaTexto = lectorFlujo.readLine();
+            }
+            lectorFlujo.close();
+
+            if (matriz.length != 0) {
+                for (int h = 0; h < matriz.length; h++) {
+                    for (int o = 1; o < matriz[0].length; o++) {
+                        String text = matriz[h][o];
+                        if (text != null) {
+                            Pattern p = Pattern.compile("(?i)" + text);
+                            Matcher m = p.matcher(lineaTexto);
+                            while (m.find()) {
+                                if (m.find() == true) {
+                                    dis.addSintoma(text);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                while (((linea = br.readLine()) != null) & (i < d1)) {
+                    a = linea.split(":");
+                    for (int j = 0; j < a.length; j++) {
+                        matriz[i][j] = a[j];
+                    }
+                    i++;
+                }
+            }
+            return dis;
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
+    public ArrayList<Ev> performNLP(String diseaseClinicalManifestations)
+            throws Exception {
+        ArrayList<Ev> concepts = new ArrayList<Ev>();
+        List<Result> results = this.mmapi
+                .processCitationsFromString(diseaseClinicalManifestations);
+        for (int j = 0; j < results.size(); j++) {
+            Result result = results.get(j);
+            for (Utterance utterance : result.getUtteranceList()) {
+                for (PCM pcm : utterance.getPCMList()) {
+                    for (Mapping map : pcm.getMappingList()) {
+                        for (Ev mapEv : map.getEvList()) {
+                            if (isAValidSemanticType(mapEv.getSemanticTypes())) {
+                                concepts.add(mapEv);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return concepts;
+    }
+
+    private boolean isAValidSemanticType(List<String> semanticTypes) {
+        for (int i = 0; i < SEMANTIC_TYPES.length; i++) {
+            String validSemanticType = SEMANTIC_TYPES[i];
+            if (semanticTypes.contains(validSemanticType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+public void buscarpalabra(JTextArea area1, String texto) {
+
+        if (texto.length() >= 1) {
+            DefaultHighlighter.DefaultHighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.GREEN);
+            Highlighter h = area1.getHighlighter();
+            h.removeAllHighlights();
+            String text = area1.getText();
+            String caracteres = texto;
+            Pattern p = Pattern.compile("(?i)" + caracteres);
+            Matcher m = p.matcher(text);
+            while (m.find()) {
+                try {
+                    h.addHighlight(m.start(), m.end(), highlightPainter);
+                    al.add(t2.getText());
+                    t2.setText("");
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(Color.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(area1, "la palabra a buscar no puede ser vacia");
+        }
+    }
+----------------------------------------------------------------------------
+public void ClasificarEnfermedades() {
+        String nombreFichS = txtPathArchivoSint.getText();
+        String nombreFichE = txtPathArchivoEnf.getText();
+        String fileC = txtPathNuevoArchivo.getText();
+
+        FileReader frS = null;
+        FileReader frE = null;
+        FileWriter fw = null;
+
+        File ficheroS = new File(nombreFichS);
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        String files;
+        String line;
+        int d1 = size(nombreFichS);
+
+        try {
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()) {
+                    String path = listOfFiles[i].getPath();
+                    BufferedReader brE = new BufferedReader(new FileReader(path));
+                    String name = listOfFiles[i].getName();
+                    System.out.println(name);
+//                    if (brE != null) {
+//                        while ((line = brE.readLine()) != null) {
+//                            cadenas.add(line);
+//                        }
+//                    }
+//                    if (cadenas.size() != 0) {
+//                        frS = new FileReader(ficheroS);
+//                        BufferedReader br = new BufferedReader(frS);
+//                        String linea;
+//                        String matriz[][] = new String[d1][2];
+//                        int s = 0;
+//                        String[] a = new String[d1];
+//                        while (((linea = br.readLine()) != null) & (i < d1)) {
+//                            a = linea.split(":");
+//                            for (int j = 0; j < a.length; j++) {
+//                                matriz[i][j] = a[j];
+//                            }
+//                            i++;
+//                        }
+//
+//                        for (int h = 0; h < matriz.length; h++) {
+//                            for (int o = 1; o < matriz[0].length; o++) {
+//                                palabras.add(matriz[h][o]);
+//                            }
+//                        }
+//
+//                        if (palabras.size() != 0) {
+//                            if (busqueda()) {
+//                                String input = "";
+//                                String sins = "";
+//                                
+//                                for (String encontrada : encontradas) {
+//                                    sins += encontrada + "\r\n";
+//                                }
+//                                
+//                                input = "Enfermedad:"+name+"\r\n"+
+//                                        "Sintomas:\r\n"+
+//                                        sins;
+//                                System.out.println(input);
+////                                FileOutputStream fileOut = new FileOutputStream(new File(fileC+name));
+////                                fileOut.write(input.getBytes());
+////                                fileOut.close();
+//                            }
+//                        }
+//                    }
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static boolean busqueda() {
+        String patron = String.join("|", palabras);
+        for (String cadena : cadenas) {
+            Pattern pattern = Pattern.compile("\\b(" + patron + ")\\b", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(cadena);
+            String cadena_modif = "";
+            while (matcher.find()) {
+                nencontradas++;
+                cadena_modif = cadena.replaceAll("\\b(?i)(" + matcher.group(1) + ")\\b", "<<$1>>");
+            }
+            if (!cadena_modif.isEmpty()) {
+                encontradas.add(cadena_modif);
+            }
+        }
+        if (encontradas.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public void TranformSinsFile() {
+        //metodo para modoficar archivo sifntomas y eliminar "(finding)"
+        String nombreFichS = txtPathArchivoSint.getText();
+
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(nombreFichS));
+            String line;
+            String input = "";
+            while ((line = file.readLine()) != null) {
+                if (line.contains(",") & line.contains("(finding)")) {
+                    String li = line.replaceFirst(",", ":");
+                    input += li.replaceAll("\\(finding\\)", "\r\n");
+                } else {
+                    input += line + "\r\n";
+                }
+            }
+            FileOutputStream fileOut = new FileOutputStream(nombreFichS);
+            fileOut.write(input.getBytes());
+            fileOut.close();
+            JOptionPane.showMessageDialog(this, "Operación Realizada con éxito");
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
+-----------------------------------
+-----------------------------------
+public void ClasificarEnfermedades(){
+        String nombreFichS = txtPathArchivoSint.getText();
+        String nombreFichE = txtPathArchivoEnf.getText();
+        
+        FileReader fr = null;
+        FileWriter fw = null;
+        
+        File ficheroS = new File(nombreFichS);
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+        
+        String files;
+        int d1 = size(nombreFichS);
+        
+        //llenar matriz con directorios
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                files = listOfFiles[i].getPath();
+            }
+        }
+        
+        //llenar matriz con contenido txt
+        try {
+            fr = new FileReader(ficheroS);
+            BufferedReader br = new BufferedReader(fr);
+            String linea;
+            String matriz[][] = new String[d1][2];
+            int i = 0;
+            String[] a = new String[d1];
+            
+            while (((linea = br.readLine()) != null) & (i < d1)) {
+                a = linea.split(":");
+                for (int j = 0; j < a.length; j++) {
+                    matriz[i][j] = a[j];
+                }
+                i++;
+                clean();
+            }
+            for (int h = 0; h < matriz.length; h++) {
+                for (int o = 1; o < matriz[0].length; o++) {
+                    System.out.print(matriz[h][o]);
+                }
+                System.out.println();
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+public void SE3() {
+        ArrayList<SintomasBO> sinBO = new ArrayList<SintomasBO>();
+        String nombreFichS = txtPathArchivoSint.getText();
+        String nombreFichE = txtPathArchivoEnf.getText();
+
+        File FileSins = new File(nombreFichS);
+        Scanner s = null;
+        try {
+            s = new Scanner(FileSins);
+            String linea;
+
+            while (s.hasNextLine()) {
+                linea = s.nextLine();
+                String[] Split = linea.split(",");
+                SintomasBO oSins = new SintomasBO();
+                oSins.setCodSins(Split[0]);
+                oSins.setNomSins(Split[1]);
+
+                sinBO.add(oSins);
+            }
+
+            Iterator<SintomasBO> it = sinBO.iterator();
+            while (it.hasNext()) {
+                SintomasBO Sins = it.next();
+                System.out.println(Sins.getCodSins());
+            }
+        } catch (FileNotFoundException | NumberFormatException e) {
+        } finally {
+            try {
+                if (s != null) {
+                    s.close();
+                }
+            } catch (Exception e2) {
+            }
+        }
+
+        Iterator<SintomasBO> it = sinBO.iterator();
+        while (it.hasNext()) {
+            SintomasBO Sintoma = it.next();
+            System.out.println(Sintoma.getCodSins() + " " + Sintoma.getNomSins());
+        }
+    }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    public void CrearArchivo1() {
+        String nombreFichS = txtPathArchivoSint.getText();
+        String nombreFichE = txtPathArchivoEnf.getText();
+        String fileC = txtPathNuevoArchivo.getText();
+
+        FileReader fr = null;
+        FileWriter fw = null;
+
+        File ficheroS = new File(nombreFichS);
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        String delimiter = ",";
+        String files;
+
+        int d1 = 0;
+
+        ArrayList listSin = null;
+        ArrayList listDis;
+
+        try {
+            BufferedReader fich = new BufferedReader(new FileReader(nombreFichS));
+            int contadorL = 0;
+            String linea;
+            try {
+                while ((linea = fich.readLine()) != null) {
+                    contadorL++;
+                }
+                d1 = contadorL;
+                //Sintoma = new String[contadorL][2];
+            } catch (IOException e) {
+            }
+        } catch (FileNotFoundException e) {
+        }
+
+        //llenar matriz con contenido txt
+        try {
+            fw = new FileWriter(fileC + "Base de Conocimiento.txt");
+            fr = new FileReader(ficheroS);
+            BufferedReader br = new BufferedReader(fr);
+            String linea;
+            String matriz[][] = new String[d1][2];
+            int i = 0;
+            String[] a = new String[d1];
+            //PrintWriter escribir = new PrintWriter(fw);
+            while (((linea = br.readLine()) != null) & (i < d1)) {
+                a = linea.split(delimiter);
+                for (int l = 0; l < d1; l++) {
+                    for (int j = 0; j < a.length; j++) {
+                        matriz[l][j] = a[j];
+                    }
+                }
+                i++;
+                clean();
+            }
+            for (int h = 0; h < matriz.length; h++) {
+                for (int o = 0; o < matriz[0].length; o++) {
+                    System.out.print(matriz[h][o]);
+                }
+                System.out.println();
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        try {
+            Iterator it = listSin.iterator();
+            while (it.hasNext()) {
+                System.out.println(it.next());
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    public void SE() {
+        String nombreFichS = txtPathArchivoSint.getText();
+        String nombreFichE = txtPathArchivoEnf.getText();
+        //String fileC = txtPathNuevoArchivo.getText();
+
+        FileReader fr;
+        //FileWriter fw;
+
+        File ficheroS = new File(nombreFichS);
+        File ficheroE = new File(nombreFichE);
+        File[] listOfFiles = ficheroE.listFiles();
+
+        String delimiter = ",";
+        String files;
+
+        //llenar matriz con directorios
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                files = listOfFiles[i].getPath();
+                if (files.endsWith(".txt") || files.endsWith(".TXT") || files.endsWith(".dis") || files.endsWith(".DIS")) {
+                    System.out.println(files);
+                }
+            }
+        }
+
+        int d1 = size(nombreFichS);
+
+        //llenar matriz con contenido txt
+        try {
+            fr = new FileReader(ficheroS);
+            BufferedReader br = new BufferedReader(fr);
+            ArrayList<ArrayList<String>> array = new ArrayList<>();
+            int i, j;
+            String linea;
+
+            for (i = 0; i < d1; i++) {
+                linea = br.readLine();
+                array.add(new ArrayList<>());
+                while ((linea = br.readLine()) != null) {
+                    array.get(i).add(Arrays.toString(linea.split(delimiter)));
+                }
+            }
+//
+//            //Mostrar todas las notas
+            System.out.println("Notas de alumnos");
+            for (i = 0; i < array.size(); i++) { //para cada alumno (para cada fila)
+                for (j = 0; j < array.get(i).size(); j++) { //se recorre todas la columnas de la fila
+                    System.out.println(array.get(i).get(j)); //se obtiene el elemento i,j
+                }
+                System.out.println();
+            }
+//            while ((linea = br.readLine()) != null) {
+//                a.add(Arrays.toString(linea.split(delimiter)));
+//            }
+//
+//            for (i = 0; i < a.size(); i++) {
+//                System.out.println(a.get(i));
+//            }
+//            Iterator it = a.iterator();
+//            while (it.hasNext()) {
+//                System.out.println(it.next());
+//            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
